@@ -30,9 +30,12 @@
 
 package com.raywenderlich.android.combinestagram
 
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -59,14 +62,43 @@ class MainActivity : AppCompatActivity() {
     saveButton.setOnClickListener {
       actionSave()
     }
+
+    viewModel.getSelectedPhotos().observe(this, Observer { photos ->
+      photos?.let {
+        if (photos.isNotEmpty()) {
+          val bitmaps = photos.map {
+            BitmapFactory.decodeResource(resources, it.drawable)
+          }
+          val newBitmap = combineImages(bitmaps)
+          collageImage.setImageDrawable(BitmapDrawable(resources, newBitmap))
+        } else {
+          collageImage.setImageResource(android.R.color.transparent)
+        }
+        updateUi(photos)
+      }
+    })
+  }
+
+  private fun updateUi(photos: List<Photo>) {
+    saveButton.isEnabled = photos.isNotEmpty() && (photos.size % 2 == 0)
+    clearButton.isEnabled = photos.isNotEmpty()
+    addButton.isEnabled = photos.size < 4
+    title = if (photos.isNotEmpty()) {
+      resources.getQuantityString(R.plurals.photos_format, photos.size,
+              photos.size)
+    } else {
+      getString(R.string.collage)
+    }
   }
 
   private fun actionAdd() {
-    println("actionAdd")
+    /*println("actionAdd")*/
+    viewModel.addPhoto(PhotoStore.photos[0])
   }
 
   private fun actionClear() {
-    println("actionClear")
+    /*println("actionClear")*/
+    viewModel.clearPhotos()
   }
 
   private fun actionSave() {

@@ -36,6 +36,11 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.widget.ImageView
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -43,6 +48,39 @@ import java.io.OutputStream
 
 
 class SharedViewModel : ViewModel() {
+
+  // 1
+  private val disposables = CompositeDisposable()
+  // 2
+  private val imagesSubject: BehaviorSubject<MutableList<Photo>>
+          = BehaviorSubject.createDefault<MutableList<Photo>>(mutableListOf())
+  // 3
+  private val selectedPhotos = MutableLiveData<List<Photo>>()
+
+  init {
+    imagesSubject.subscribe { photos ->
+      selectedPhotos.value = photos
+    }.addTo(disposables)
+  }
+
+  override fun onCleared() {
+    disposables.dispose()
+    super.onCleared()
+  }
+
+  fun getSelectedPhotos(): LiveData<List<Photo>> {
+    return selectedPhotos
+  }
+
+  fun addPhoto(photo: Photo) {
+    imagesSubject.value?.add(photo)
+    imagesSubject.onNext(imagesSubject.value!!)
+  }
+
+  fun clearPhotos() {
+    imagesSubject.value?.clear()
+    imagesSubject.onNext(imagesSubject.value!!)
+  }
 
   fun saveBitmapFromImageView(imageView: ImageView, context: Context) {
     val tmpImg = "${System.currentTimeMillis()}.png"
