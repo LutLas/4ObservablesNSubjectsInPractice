@@ -72,10 +72,10 @@ class SharedViewModel : ViewModel() {
     return selectedPhotos
   }
 
-  fun addPhoto(photo: Photo) {
+  /*fun addPhoto(photo: Photo) {
     imagesSubject.value?.add(photo)
     imagesSubject.onNext(imagesSubject.value!!)
-  }
+  }*/
 
   fun clearPhotos() {
     imagesSubject.value?.clear()

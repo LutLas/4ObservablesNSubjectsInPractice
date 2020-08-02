@@ -92,8 +92,12 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun actionAdd() {
-    /*println("actionAdd")*/
-    viewModel.addPhoto(PhotoStore.photos[0])
+    /*println("actionAdd")
+    viewModel.addPhoto(PhotoStore.photos[0])*/
+    val addPhotoBottomDialogFragment =
+            PhotosBottomDialogFragment.newInstance()
+    addPhotoBottomDialogFragment
+            .show(supportFragmentManager, "PhotosBottomDialogFragment")
   }
 
   private fun actionClear() {
