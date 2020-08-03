@@ -37,10 +37,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.layout_photo_bottom_sheet.*
 
 
 class PhotosBottomDialogFragment : BottomSheetDialogFragment(), PhotosAdapter.PhotoListener {
+
+  private val selectedPhotosSubject = PublishSubject.create<Photo>()
+
+  val selectedPhotos: Observable<Photo>
+    get() = selectedPhotosSubject.hide()
 
   private lateinit var viewModel: SharedViewModel
 
@@ -65,7 +72,7 @@ class PhotosBottomDialogFragment : BottomSheetDialogFragment(), PhotosAdapter.Ph
   }
 
   override fun photoClicked(photo: Photo) {
-
+    selectedPhotosSubject.onNext(photo)
   }
 
   companion object {

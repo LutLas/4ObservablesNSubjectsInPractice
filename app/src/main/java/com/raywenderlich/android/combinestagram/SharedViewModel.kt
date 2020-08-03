@@ -38,6 +38,7 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
@@ -76,6 +77,17 @@ class SharedViewModel : ViewModel() {
     imagesSubject.value?.add(photo)
     imagesSubject.onNext(imagesSubject.value!!)
   }*/
+  fun subscribeSelectedPhotos(selectedPhotos: Observable<Photo>) {
+    selectedPhotos
+            .doOnComplete {
+              Log.v("SharedViewModel", "Completed selecting photos")
+            }
+            .subscribe { photo ->
+              imagesSubject.value?.add(photo)
+              imagesSubject.onNext(imagesSubject.value!!)
+            }
+            .addTo(disposables)
+  }
 
   fun clearPhotos() {
     imagesSubject.value?.clear()

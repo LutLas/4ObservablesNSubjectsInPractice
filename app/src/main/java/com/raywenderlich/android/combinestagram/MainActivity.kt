@@ -98,6 +98,9 @@ class MainActivity : AppCompatActivity() {
             PhotosBottomDialogFragment.newInstance()
     addPhotoBottomDialogFragment
             .show(supportFragmentManager, "PhotosBottomDialogFragment")
+
+    viewModel.subscribeSelectedPhotos(
+            addPhotoBottomDialogFragment.selectedPhotos)
   }
 
   private fun actionClear() {
