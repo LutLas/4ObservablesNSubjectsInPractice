@@ -71,6 +71,11 @@ class PhotosBottomDialogFragment : BottomSheetDialogFragment(), PhotosAdapter.Ph
     photosRecyclerView.adapter = PhotosAdapter(PhotoStore.photos, this)
   }
 
+  override fun onDestroyView() {
+    selectedPhotosSubject.onComplete()
+    super.onDestroyView()
+  }
+
   override fun photoClicked(photo: Photo) {
     selectedPhotosSubject.onNext(photo)
   }
