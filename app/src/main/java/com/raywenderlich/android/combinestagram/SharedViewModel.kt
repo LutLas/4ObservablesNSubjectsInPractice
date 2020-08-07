@@ -39,6 +39,7 @@ import android.widget.ImageView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.subjects.BehaviorSubject
@@ -94,26 +95,32 @@ class SharedViewModel : ViewModel() {
     imagesSubject.onNext(imagesSubject.value!!)
   }
 
-  fun saveBitmapFromImageView(imageView: ImageView, context: Context) {
-    val tmpImg = "${System.currentTimeMillis()}.png"
+  fun saveBitmapFromImageView(imageView: ImageView, context: Context):
+          Single<String> {
+    return Single.create { emitter ->
+      val tmpImg = "${System.currentTimeMillis()}.png"
 
-    val os: OutputStream?
+      val os: OutputStream?
 
-    val collagesDirectory = File(context.getExternalFilesDir(null), "collages")
-    if (!collagesDirectory.exists()) {
-      collagesDirectory.mkdirs()
-    }
+      val collagesDirectory =
+              File(context.getExternalFilesDir(null), "collages")
+      if (!collagesDirectory.exists()) {
+        collagesDirectory.mkdirs()
+      }
 
-    val file = File(collagesDirectory, tmpImg)
+      val file = File(collagesDirectory, tmpImg)
 
-    try {
-      os = FileOutputStream(file)
-      val bitmap = (imageView.drawable as BitmapDrawable).bitmap
-      bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
-      os.flush()
-      os.close()
-    } catch(e: IOException) {
-      Log.e("MainActivity", "Problem saving collage", e)
+      try {
+        os = FileOutputStream(file)
+        val bitmap = (imageView.drawable as BitmapDrawable).bitmap
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+        os.flush()
+        os.close()
+        emitter.onSuccess(tmpImg)
+      } catch(e: IOException) {
+        Log.e("MainActivity", "Problem saving collage", e)
+        emitter.onError(e)
+      }
     }
   }
 }
